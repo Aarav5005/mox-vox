@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Test - MOX VOX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #fff;
+        }
+        .test-item {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #d4af37;
+            background: #1a1a1a;
+        }
+        .success { border-left-color: #4caf50; }
+        .error { border-left-color: #c0392b; }
+    </style>
+</head>
+<body>
+    <h1>MOX VOX Server Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        async function testServer() {
+            const tests = [
+                {
+                    name: 'Manifest JSON',
+                    url: 'assets/manifest.json',
+                    type: 'json'
+                },
+                {
+                    name: 'CSS File',
+                    url: 'css/style.css',
+                    type: 'text'
+                },
+                {
+                    name: 'JavaScript File',
+                    url: 'js/main.js',
+                    type: 'text'
+                },
+                {
+                    name: 'Image File',
+                    url: 'assets/images/IMG_20260110_163141.jpg',
+                    type: 'image'
+                },
+                {
+                    name: 'Video File',
+                    url: 'assets/video/WhatsApp Video 2026-01-11 at 12.29.13 AM.mp4',
+                    type: 'video'
+                }
+            ];
+            
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.url);
+                    if (response.ok) {
+                        results.innerHTML += `
+                            <div class="test-item success">
+                                ✓ ${test.name}: OK (${response.status})
+                            </div>
+                        `;
+                    } else {
+                        results.innerHTML += `
+                            <div class="test-item error">
+                                ✗ ${test.name}: Failed (${response.status})
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    results.innerHTML += `
+                        <div class="test-item error">
+                            ✗ ${test.name}: Error - ${error.message}
+                        </div>
+                    `;
+                }
+            }
+            
+            // Test manifest content
+            try {
+                const manifestResponse = await fetch('assets/manifest.json');
+                if (manifestResponse.ok) {
+                    const manifest = await manifestResponse.json();
+                    results.innerHTML += `
+                        <div class="test-item success">
+                            ✓ Manifest Content: ${manifest.images.length} images, ${manifest.videos.length} videos
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                results.innerHTML += `
+                    <div class="test-item error">
+                        ✗ Manifest Content: Could not parse
+                    </div>
+                `;
+            }
+        }
+        
+        testServer();
+    </script>
+</body>
+</html>
