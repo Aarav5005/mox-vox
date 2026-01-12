@@ -22,6 +22,7 @@
         initHeroVideo();
         initInteractiveMenu();
         initPartyPackages();
+        initWhatsAppBooking();
         initAboutAnimations();
         initReviewsAnimation();
         initMobileReservePill();
@@ -457,11 +458,11 @@
                 priceNote: '+ GST (Per Person)',
                 includes: [
                     'Welcome drink',
-                    'Unlimited veg food',
+                    'Unlimited vegetarian food',
                     '3 Starters + 1 Special Starter',
                     'Main course, rice & breads',
                     'Ice cream',
-                    'DJ / club setup (minimum pax as applicable)'
+                    'DJ / club setup (minimum guests as applicable)'
                 ],
                 description: null
             },
@@ -471,8 +472,8 @@
                 priceNote: '+ GST (Per Person)',
                 includes: [
                     'Welcome drink',
-                    'Unlimited veg food',
-                    'Starters, paneer & veg curries',
+                    'Unlimited vegetarian food',
+                    'Starters, paneer & vegetarian curries',
                     'Rice, breads',
                     'Ice cream',
                     'Ideal for office parties & formal gatherings'
@@ -484,7 +485,7 @@
                 priceAmount: '₹569',
                 priceNote: '+ GST (Per Person)',
                 includes: [
-                    'Premium unlimited veg menu',
+                    'Premium unlimited vegetarian menu',
                     '2 Soups',
                     '2 Starters + 1 Special Starter',
                     'Expanded main course & breads',
@@ -822,8 +823,8 @@
                 priceNote: 'All Inclusive',
                 includes: [
                     'Welcome drinks',
-                    'Veg starters',
-                    'Veg main course',
+                    'Vegetarian starters',
+                    'Vegetarian main course',
                     'DJ music',
                     'Party seating',
                     'Club-style ambience'
@@ -842,7 +843,7 @@
                     'Ice cream',
                     'DJ & club setup'
                 ],
-                minimum: 'Minimum: 20 pax for DJ, 30 pax for club',
+                minimum: 'Minimum: 20 guests for DJ, 30 guests for club',
                 ctaText: 'Plan My Birthday'
             },
             'corporate': {
@@ -852,7 +853,7 @@
                 includes: [
                     'Welcome drink',
                     'Starter',
-                    'Paneer, veg, dal',
+                    'Paneer, vegetarian curries, dal',
                     'Rice & breads',
                     'Salad, pickle, ice cream'
                 ],
@@ -866,7 +867,7 @@
                     '2 welcome drinks',
                     'Soup',
                     '2 starters + 2 special starters',
-                    'Paneer, veg, dal, rice',
+                    'Paneer, vegetarian curries, dal, rice',
                     '3 breads',
                     'Ice cream'
                 ],
@@ -908,7 +909,7 @@
                 html += `<div class="party-package-detail-note">${pkg.note}</div>`;
             }
 
-            html += `<a href="#contact" class="party-package-cta">${pkg.ctaText}</a>`;
+            html += `<button class="party-package-cta" data-package="${packageKey}"><span class="whatsapp-icon">📱</span> ${pkg.ctaText}</button>`;
 
             // Fade transition
             partyDetailsContent.classList.add('fade-transition');
@@ -932,6 +933,16 @@
                 
                 // Render package details
                 renderPartyPackage(packageKey);
+                
+                // Also open WhatsApp for direct booking
+                const packageTitles = {
+                    'small-party': 'Small Party Plan',
+                    'birthday': 'Birthday Party Package',
+                    'corporate': 'Corporate Party Package',
+                    'family': 'Family Party Package'
+                };
+                const packageName = packageTitles[packageKey] || 'Party Package';
+                openWhatsAppBooking(packageName);
             });
         });
 
@@ -1320,5 +1331,56 @@
     initMobileReservePill();
     initOpenNowBadge();
     initWhatsAppHighlight();
+
+    /* ========================================
+       WHATSAPP BOOKING FUNCTION
+       Premium click-to-chat booking experience
+       ======================================== */
+    function initWhatsAppBooking() {
+        // WhatsApp booking function
+        function openWhatsAppBooking(packageName) {
+            const phoneNumber = '919461761555';
+            const message = encodeURIComponent(`Hi! I'm interested in booking the ${packageName} at MOX VOX. Can you please provide more details and availability?`);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Attach WhatsApp handlers to party package CTAs (works for both buttons and anchors)
+        document.addEventListener('click', function(e) {
+            const element = e.target.closest('.party-package-cta');
+            if (element) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const packageKey = element.getAttribute('data-package');
+                if (!packageKey) return;
+                
+                const packageTitles = {
+                    'small-party': 'Small Party Plan',
+                    'birthday': 'Birthday Party Package', 
+                    'corporate': 'Corporate Party Package',
+                    'family': 'Family Party Package'
+                };
+                const packageName = packageTitles[packageKey] || 'Party Package';
+                openWhatsAppBooking(packageName);
+            }
+        });
+
+        // Attach WhatsApp handlers to party options for direct booking
+        const partyOptions = document.querySelectorAll('.party-option');
+        partyOptions.forEach(option => {
+            option.addEventListener('dblclick', function() {
+                const packageKey = this.getAttribute('data-package');
+                const packageTitles = {
+                    'small-party': 'Small Party Plan',
+                    'birthday': 'Birthday Party Package',
+                    'corporate': 'Corporate Party Package',
+                    'family': 'Family Party Package'
+                };
+                const packageName = packageTitles[packageKey] || 'Party Package';
+                openWhatsAppBooking(packageName);
+            });
+        });
+    }
 
 })();
